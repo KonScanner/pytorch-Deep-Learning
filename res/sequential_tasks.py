@@ -16,13 +16,9 @@ def pad_sequences(sequences, maxlen=None, dtype='int32',
     if maxlen is None:
         maxlen = np.max(lengths)
 
-    # take the sample shape from the first non empty sequence
-    # checking for consistency in the main loop below.
-    sample_shape = tuple()
-    for s in sequences:
-        if len(s) > 0:
-            sample_shape = np.asarray(s).shape[1:]
-            break
+    sample_shape = next(
+        (np.asarray(s).shape[1:] for s in sequences if len(s) > 0), tuple()
+    )
 
     is_dtype_str = np.issubdtype(dtype, np.str_) or np.issubdtype(dtype, np.unicode_)
     if isinstance(value, six.string_types) and dtype != object and not is_dtype_str:
@@ -159,10 +155,10 @@ class TemporalOrderExp6aSequence():
                       [self.start_symbol] + [self.end_symbol]
         self.n_symbols = len(all_symbols)
         self.s_to_idx = {s: n for n, s in enumerate(all_symbols)}
-        self.idx_to_s = {n: s for n, s in enumerate(all_symbols)}
+        self.idx_to_s = dict(enumerate(all_symbols))
 
         self.c_to_idx = {c: n for n, c in enumerate(self.classes)}
-        self.idx_to_c = {n: c for n, c in enumerate(self.classes)}
+        self.idx_to_c = dict(enumerate(self.classes))
 
     def generate_pair(self):
         length = np.random.randint(self.length_range[0], self.length_range[1])

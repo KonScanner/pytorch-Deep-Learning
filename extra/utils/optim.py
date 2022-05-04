@@ -19,10 +19,7 @@ class Optim(Optimizer):
             closure (callable, optional): A closure that reevaluates the model
                 and returns the loss.
         """
-        loss = None
-        if closure is not None:
-            loss = closure()
-
+        loss = closure() if closure is not None else None
         for group in self.param_groups:
             for p in group['params']:
                 if p.grad is None:
@@ -67,10 +64,7 @@ def output(opt, nsteps = 10, noise=0.0, fname="example.png"):
         yopt.append(w[1].item())
 
         def obj():
-            if noise > 0.0:
-                bnoise = torch.normal(b, noise)
-            else:
-                bnoise = b
+            bnoise = torch.normal(b, noise) if noise > 0.0 else b
             loss = 0.5 * w @ (A @ w) + bnoise @ w
             opt.zero_grad()
             loss.backward()
